@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" 
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" 
+        crossorigin="anonymous">
+
+        <header>
+            <h1>BookingAppointmentApp</h1>
+        </header>
+    </head>
+    <body>
+        <form onsubmit="onSubmit(event)">
+            <label id="name`">Name</label></br>
+            <input type="text" id="name" name="name" required> </br>
+       
+            <label id="phonenumber`">PhoneNumber</label></br>
+            <input type="text" id="phonenumber" name="phonenumber" required> </br> 
+          
+            <label id="email`">Email</label></br>
+            <input type="email" id="email" name="email" required></br>
+            
+            <button type="submit">Submit</button>
+        </form>
+        <ul id="AppointmentDetails"></ul>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+
+        <script>
+             function onSubmit(event) {
+             event.preventDefault();
+
+            const name = event.target.name.value;
+            const phonenumber = event.target.phonenumber.value;
+            const email = event.target.email.value;
+
+            const obj = {
+                name,
+                phonenumber,
+                email
+            };
+
+            axios.post('http://localhost:3000/user/add-user', obj)
+                .then(response => {
+                    showOnScreen(response.data.newUserDetail);
+                })
+                .catch(err =>{
+                    document.body.innerHTML=document.body.innerHTML+"<h4>Something went wrong</h4>"
+                    console.log(err)
+                });
+
+            event.target.reset();
+        }
+
+        function showOnScreen(user) {
+            const parentNode = document.getElementById('AppointmentDetails');
+            const li = document.createElement('li');
+            li.id = user.id;
+            li.innerHTML = `${user.name} - ${user.phonenumber} - ${user.email}
+                <button onclick="deleteUser('${user.id}')">Delete</button>
+                <button onclick="editUser('${user.id}', '${user.name}','${user.phonenumber}','${user.email}')">Edit</button>`;
+            parentNode.appendChild(li);
+        } 
+
+        function deleteUser(userId){
+            axios.delete(`http://localhost:3000/user/delete-user/${userId}`)//here${userId} is DYNAMIC ROUTING //since value of ${userId} is different for every user, in db check id col values
+            .then((response)=>{
+                console.log('calling screendelete')
+                removeUserFromScreen(userId)
+            })
+            .catch(err=>{console.log(err)})
+        }
+
+        function editUser(id,name,phonenumber,email){
+            document.getElementById('name').value=name
+            document.getElementById('phonenumber').value=phonenumber
+            document.getElementById('email').value=email
+            deleteUser(id)
+        }
+
+        function removeUserFromScreen(userId){
+            const parentNode=document.getElementById('AppointmentDetails')
+            const deleteNode=document.getElementById(userId)
+            console.log('deleting node',userId)
+            if(deleteNode){
+                parentNode.removeChild(deleteNode)
+            }
+            
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            axios.get('http://localhost:3000/user/get-user')
+                .then(response => {
+                    for (var i = 0; i < response.data.allUsers.length; i++) {
+                        showOnScreen(response.data.allUsers[i]);
+                    }
+                })
+                .catch(err => console.log(err));
+        });
+
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../sharpener_frontend/project"
+		},
+		{
+			"path": "../sharpener_frontend/Booking"
+		},
+		{
+			"path": "../sharpener_frontend/BookingAppointment"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "nodeJSProject"
+	}
+}
